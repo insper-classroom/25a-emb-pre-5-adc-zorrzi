@@ -13,8 +13,8 @@ QueueHandle_t xQueueData;
 void data_task(void *p) {
     vTaskDelay(pdMS_TO_TICKS(400));
 
-    int data_len = sizeof(sine_wave_four_cycles) / sizeof(sine_wave_four_cycles[0]);
-    for (int i = 0; i < data_len; i++) {
+    int total = sizeof(sine_wave_four_cycles) / sizeof(sine_wave_four_cycles[0]);
+    for (int i = 0; i < total; i++) {
         xQueueSend(xQueueData, &sine_wave_four_cycles[i], 1000000);
     }
 
@@ -24,17 +24,13 @@ void data_task(void *p) {
 }
 
 void process_task(void *p) {
-    int data = 0;
-
     int received = 0;
     static int window[5] = {0};
     static int pos = 0;
     static int total_sum = 0;
 
-    while (true) {
-        if (xQueueReceive(xQueueData, &data, 100)) {
-            // implementar filtro aqui!
-
+    while (1) {
+        if (xQueueReceive(xQueueData, &received, 100)) {
             total_sum -= window[pos];
 
             window[pos] = received;
@@ -48,7 +44,6 @@ void process_task(void *p) {
             pos = (pos + 1) % 5;
 
             vTaskDelay(pdMS_TO_TICKS(50));
-
         }
     }
 }
@@ -58,8 +53,8 @@ int main() {
 
     xQueueData = xQueueCreate(64, sizeof(int));
 
-    xTaskCreate(data_task, "Data task ", 4096, NULL, 1, NULL);
-    xTaskCreate(process_task, "Process task", 4096, NULL, 1, NULL);
+    xTaskCreate(data_task, "Data Task", 4096, NULL, 1, NULL);
+    xTaskCreate(process_task, "Processing Task", 4096, NULL, 1, NULL);
 
     vTaskStartScheduler();
 

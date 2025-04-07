@@ -39,7 +39,7 @@ void process_task(void *p) {
 
             int filtered = total_sum / 5;
 
-            printf("voltage: %d\n", filtered);
+            printf("%d\n", filtered);
 
             pos = (pos + 1) % 5;
 

@@ -7,6 +7,9 @@
 #include <stdio.h>
 
 #include "data.h"
+
+#define WINDOW_SIZE 5
+
 QueueHandle_t xQueueData;
 
 // não mexer! Alimenta a fila com os dados do sinal
@@ -26,12 +29,27 @@ void data_task(void *p) {
 void process_task(void *p) {
     int data = 0;
 
+    static int window[WINDOW_SIZE] = {0};
+    static int index = 0;
+    static int count = 0;
+    static int sum = 0;
+
     while (true) {
         if (xQueueReceive(xQueueData, &data, 100)) {
-            // implementar filtro aqui!
+            // Implementação do filtro de média móvel
 
+            sum -= window[index];
 
+            window[index] = data;
+            sum += data;
 
+            index = (index + 1) % WINDOW_SIZE;
+
+            if (count < WINDOW_SIZE) count++;
+
+            int average = sum / count;
+
+            printf("%d\n", average);
 
             // deixar esse delay!
             vTaskDelay(pdMS_TO_TICKS(50));

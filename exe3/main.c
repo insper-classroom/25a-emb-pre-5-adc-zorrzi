@@ -37,19 +37,16 @@ void process_task(void *p) {
     while (true) {
         if (xQueueReceive(xQueueData, &data, 100)) {
             // Implementação do filtro de média móvel
-
             sum -= window[index];
-
             window[index] = data;
             sum += data;
 
             index = (index + 1) % WINDOW_SIZE;
-
             if (count < WINDOW_SIZE) count++;
 
             int average = sum / count;
 
-            printf("%d\n", average);
+            printf("voltage: %d\n", average);
 
             // deixar esse delay!
             vTaskDelay(pdMS_TO_TICKS(50));
